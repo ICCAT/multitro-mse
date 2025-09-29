@@ -1,0 +1,238 @@
+---
+title: "Summary report for models in uncertainty grid (`r params$stock`)"
+format: 
+  html:
+    theme: spacelab
+    toc: true
+    toc-location: left
+    toc-title: Contents
+    page-layout: full
+embed-resources: true
+fig-dpi: 300
+params:
+  stock: 'skipjack'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, 
+                      verbose = FALSE,
+                      message = FALSE, 
+                      warning = FALSE)
+```
+
+```{r}
+require(knitr)
+require(ggplot2)
+require(dplyr)
+require(r4ss)
+require(tibble)
+require(tidyr)
+require(kableExtra)
+x_axis_size = 6
+leg_font_size = 6
+leg_size = 0.3
+```
+
+```{r}
+if(params$stock == 'bigeye') {
+  save_par = readRDS('../data/BET/summ_par.rds')
+  save_bio = readRDS('../data/BET/summ_bio.rds')
+  save_dq = readRDS('../data/BET/summ_dq.rds')
+  save_ts = readRDS('../data/BET/summ_ts.rds')
+  save_kobe = readRDS('../data/BET/summ_kobe.rds')
+}
+if(params$stock == 'skipjack') {
+  save_par = readRDS('../data/SKJ/summ_par.rds')
+  save_bio = readRDS('../data/SKJ/summ_bio.rds')
+  save_dq = readRDS('../data/SKJ/summ_dq.rds')
+  save_ts = readRDS('../data/SKJ/summ_ts.rds')
+  save_kobe = readRDS('../data/SKJ/summ_kobe.rds')
+}
+if(params$stock == 'yellowfin') {
+  save_par = readRDS('../data/YFT/summ_par.rds')
+  save_bio = readRDS('../data/YFT/summ_bio.rds')
+  save_dq = readRDS('../data/YFT/summ_dq.rds')
+  save_ts = readRDS('../data/YFT/summ_ts.rds')
+  save_kobe = readRDS('../data/YFT/summ_kobe.rds')
+}
+```
+
+This report summarizes the estimated parameters, the calculated biological reference points, and the estimated stock status relative to those reference points for model configurations included in the uncertainty grid for `r params$stock` tuna. These models compose the Reference OMs.
+
+## Parameter Estimates
+
+### Growth
+
+```{r}
+#| fig-cap: Growth parameters per model configuration. $L_1$ represents the mean length at the reference age. 
+plot_data = save_par %>% select(LAmin:CVA, mod_type) %>% 
+  pivot_longer(cols = -mod_type)
+if('gamma' %in% plot_data$name) {
+  plot_data = plot_data %>% mutate(name = factor(name, 
+                                               levels = c('LAmin', 'LAmax', 'K', 'gamma', 
+                                                          'CV1', 'CVA'),
+                                               labels = c(expression(L["1"]), 
+                                                          expression(L[infinity]), 
+                                                          "k", expression(gamma),
+                                                          expression(CV[1]),
+                                                          expression(CV[A]))))
+} else {
+  plot_data = plot_data %>% mutate(name = factor(name, 
+                                                 levels = c('LAmin', 'LAmax', 'K', 'CV1', 'CVA'),
+                                                 labels = c(expression(L["1"]), 
+                                                            expression(L[infinity]), 
+                                                            "k", expression(CV[1]),
+                                                            expression(CV[A]))))
+}
+
+ggplot(data = plot_data, aes(x = mod_type, y = value)) +
+  geom_point(aes(color = mod_type)) +
+  scale_color_viridis_d() +
+  theme_bw() +
+  xlab(NULL) + ylab('Parameter value') +
+  theme(legend.position = 'none', strip.background = element_blank(),
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size = x_axis_size)) +
+  facet_wrap(~ name, scales = 'free_y', labeller = 'label_parsed', ncol = 2)
+```
+
+### Stock-Recruitment
+
+```{r}
+#| fig-cap: Stock-recruitment parameters per model configuration.
+plot_data = save_par %>% select(R0, h, sigmaR, mod_type) %>% 
+  pivot_longer(cols = -mod_type)
+plot_data = plot_data %>% mutate(name = factor(name, 
+                                               levels = c('R0', 'h', 'sigmaR'),
+                                               labels = c(expression(R[0]), 
+                                                          "Steepness",
+                                                          expression(sigma[R]))))
+ggplot(data = plot_data, aes(x = mod_type, y = value)) +
+  geom_point(aes(color = mod_type)) +
+  scale_color_viridis_d() +
+  theme_bw() +
+  xlab(NULL) + ylab('Parameter value') +
+  theme(legend.position = 'none', strip.background = element_blank(),
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size = x_axis_size)) +
+  facet_wrap(~ name, scales = 'free_y', labeller = 'label_parsed', ncol = 2)
+```
+
+## Biology
+
+```{r}
+#| fig-cap: Values of natural mortality and mean length-at-age per model configuration.
+plot_data = save_bio %>% pivot_longer(cols = c(M, Len_Beg))
+plot_data = plot_data %>% mutate(name = factor(name, 
+                                               levels = c('M', 'Len_Beg'),
+                                               labels = c('Natural mortality', 
+                                                          'Mean length')))
+ggplot(data = plot_data, aes(x = Age_Beg, y = value)) +
+  geom_point(aes(color = mod_type)) +
+  geom_line(aes(color = mod_type)) +
+  scale_color_viridis_d() +
+  theme_bw() +
+  xlab('Age') + ylab('Value') + labs(color = NULL) +
+  theme(legend.position = 'bottom', strip.background = element_blank(),
+        legend.key.size = unit(leg_size, 'cm'), #change legend key size
+        legend.key.height = unit(leg_size, 'cm'), #change legend key height
+        legend.key.width = unit(leg_size, 'cm'), #change legend key width
+        legend.text = element_text(size=leg_font_size)) +
+  facet_wrap(~ name, scales = 'free_y', ncol = 2)
+```
+
+## Reference points
+
+```{r}
+#| fig-cap: Estimated reference points per model configuration. $SSB_0$ is the unfished spawning biomass.
+plot_data = save_dq %>% filter(Label %in% c('SSB_Virgin', 'SSB_MSY', 'annF_MSY',
+                                                          'Dead_Catch_MSY'))
+plot_data = plot_data %>% mutate(Label = factor(Label, 
+                                               levels = c('SSB_Virgin', 'SSB_MSY', 'annF_MSY',
+                                                          'Dead_Catch_MSY'),
+                                               labels = c(expression(SSB[0]), 
+                                                          expression(SSB[msy]),
+                                                          expression(F[msy]),
+                                                          "MSY")))
+ggplot(data = plot_data, aes(x = mod_type, y = Value)) +
+  geom_point(aes(color = mod_type)) +
+  scale_color_viridis_d() +
+  theme_bw() +
+  xlab(NULL) + ylab('Value') +
+  theme(legend.position = 'none', strip.background = element_blank(),
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size = x_axis_size)) +
+  facet_wrap(~ Label, scales = 'free_y', labeller = 'label_parsed', ncol = 2)
+```
+
+## Time Series
+
+### Spawning biomass (SSB)
+
+```{r}
+#| fig-cap: Time series of spawning biomass per model configuration.
+plot_data = save_ts %>% filter(var %in% "SSB")
+ggplot(plot_data, aes(x = year, y = Value)) +
+    geom_line(aes(color = mod_type)) +
+    scale_colour_viridis_d() +
+    theme_bw() +
+    ylab('Spawning biomass (tonnes)') + xlab('Year') +
+    theme(legend.key.size = unit(leg_size, 'cm'), #change legend key size
+        legend.key.height = unit(leg_size, 'cm'), #change legend key height
+        legend.key.width = unit(leg_size, 'cm'), #change legend key width
+        legend.text = element_text(size=leg_font_size)) +
+    labs(color = NULL) +
+    guides(color = guide_legend(ncol = 1))
+```
+
+### Fishing mortality (F)
+
+```{r}
+#| fig-cap: Time series of fishing mortality (reported as exploitation rate in biomass) model configuration.
+plot_data = save_ts %>% filter(var %in% "F")
+ggplot(plot_data, aes(x = year, y = Value)) +
+    geom_line(aes(color = mod_type)) +
+    scale_colour_viridis_d() +
+    theme_bw() +
+    ylab('Fishing mortality') + xlab('Year') +
+    theme(legend.key.size = unit(leg_size, 'cm'), #change legend key size
+        legend.key.height = unit(leg_size, 'cm'), #change legend key height
+        legend.key.width = unit(leg_size, 'cm'), #change legend key width
+        legend.text = element_text(size=leg_font_size)) +
+    labs(color = NULL)+
+    guides(color = guide_legend(ncol = 1))
+```
+
+### $SSB/SSB_{msy}$
+
+```{r}
+#| fig-cap: Time series of spawning biomass relative to $SSB_{msy}$ per model configuration.
+plot_data = save_kobe %>% filter(var %in% "SSB")
+ggplot(plot_data, aes(x = year, y = Value)) +
+    geom_line(aes(color = mod_type)) +
+    scale_colour_viridis_d() +
+    theme_bw() +
+    ylab(expression(SSB*'/'*SSB[msy])) + xlab('Year') +
+    theme(legend.key.size = unit(leg_size, 'cm'), #change legend key size
+        legend.key.height = unit(leg_size, 'cm'), #change legend key height
+        legend.key.width = unit(leg_size, 'cm'), #change legend key width
+        legend.text = element_text(size=leg_font_size)) +
+    labs(color = NULL)+
+    guides(color = guide_legend(ncol = 1))
+```
+
+### $F/F_{msy}$
+
+```{r}
+#| fig-cap: Time series of fishing mortality (reported as exploitation rate in biomass) relative to $F_{msy}$ per model configuration.
+plot_data = save_kobe %>% filter(var %in% "F")
+ggplot(plot_data, aes(x = year, y = Value)) +
+    geom_line(aes(color = mod_type)) +
+    scale_colour_viridis_d() +
+    theme_bw() +
+    ylab(expression(F*'/'*F[msy])) + xlab('Year') +
+    theme(legend.key.size = unit(leg_size, 'cm'), #change legend key size
+        legend.key.height = unit(leg_size, 'cm'), #change legend key height
+        legend.key.width = unit(leg_size, 'cm'), #change legend key width
+        legend.text = element_text(size=leg_font_size)) +
+    labs(color = NULL) +
+    guides(color = guide_legend(ncol = 1))
+```
+

@@ -1,0 +1,148 @@
+
+```{mermaid}
+%%| label: fig-hcr-multi
+%%| fig-cap: Example of how the annual management advice is derived. $QS_f$ represents the quota share per fleet. $E$ represents effort.
+flowchart TB
+subgraph BET["<b>Bigeye MP</b>"]
+direction TB
+bet1["SSB<sub>BET</sub>"]
+bet2["TAC<sub>BET</sub>"]
+bet3["QS<sub>f,BET</sub>"]
+bet4["Quota<sub>f,BET</sub>"]
+end
+subgraph SKJ["<b>Skipjack MP</b>"]
+direction TB
+skj1["SSB<sub>SKJ</sub>"]
+skj2["TAC<sub>SKJ</sub>"]
+skj3["QS<sub>f,SKJ</sub>"]
+skj4["Quota<sub>f,SKJ</sub>"]
+end
+subgraph YFT["<b>Yellowfin MP</b>"]
+direction TB
+yft1["SSB<sub>YFT</sub>"]
+yft2["TAC<sub>YFT</sub>"]
+yft3["QS<sub>f,YFT</sub>"]
+yft4["Quota<sub>f,YFT</sub>"]
+end
+bet5["E<sub>f,BET</sub>"]
+skj5["E<sub>f,SKJ</sub>"]
+yft5["E<sub>f,YFT</sub>"]
+HCR["E<sub>f</sub>=E<sub>f,BET</sub>"]
+bet7["Catch<sub>f,BET</sub>"]
+skj7["Catch<sub>f,SKJ</sub>"]
+yft7["Catch<sub>f,YFT</sub>"]
+
+bet1 --HCR<sub>BET</sub>--> bet2 --> bet4
+bet3 --> bet4 --> bet5
+bet5 --> HCR
+skj1 --HCR<sub>SKJ</sub>--> skj2 --> skj4
+skj3 --> skj4 --> skj5
+skj5 ~~~ HCR
+yft1 --HCR<sub>YFT</sub>--> yft2 --> yft4
+yft3 --> yft4 --> yft5
+yft5 ~~~ HCR
+HCR --> bet7
+HCR --> skj7
+HCR --> yft7
+style BET fill:#ffffff
+  style bet1 opacity:0.5,fill:#dca06d
+  style bet2 opacity:0.5,fill:#dca06d
+  style bet3 opacity:0.5,fill:#dca06d
+  style bet4 opacity:0.5,fill:#dca06d
+  style bet5 opacity:0.5,fill:#dca06d
+  style bet7 opacity:0.5,fill:#dca06d
+  style SKJ fill:#ffffff
+  style skj1 opacity:0.5,fill:#a55b4b
+  style skj2 opacity:0.5,fill:#a55b4b
+  style skj3 opacity:0.5,fill:#a55b4b
+  style skj4 opacity:0.5,fill:#a55b4b
+  style skj5 opacity:0.5,fill:#a55b4b
+  style skj7 opacity:0.5,fill:#a55b4b
+  style YFT fill:#ffffff
+  style yft1 opacity:0.5,fill:#b184b3
+  style yft2 opacity:0.5,fill:#b184b3
+  style yft3 opacity:0.5,fill:#b184b3
+  style yft4 opacity:0.5,fill:#b184b3
+  style yft5 opacity:0.5,fill:#b184b3
+  style yft7 opacity:0.5,fill:#b184b3
+  style HCR fill:#ffffff
+  
+  %% Set all nodes to black text
+linkStyle default color:#000000
+  classDef blackText color:#000000;
+  class bet1,bet2,bet3,bet4,bet5,bet7,skj1,skj2,skj3,skj4,skj5,skj7,yft1,yft2,yft3,yft4,yft5,yft7,HCR,BET,SKJ,YFT blackText;
+```
+
+```{mermaid}
+%%| label: fig-hcr-multi
+%%| fig-cap: Example of how the annual management advice is derived. $QS_f$ represents the quota share per fleet. $E$ represents effort. 
+flowchart TB
+subgraph BET["<b>Bigeye MP</b>"]
+direction TB
+bet1["SSB<sub>BET</sub>"]
+bet2["TAC<sub>BET</sub>"]
+bet3["QS<sub>f,BET</sub>"]
+bet4["Quota<sub>f,BET</sub>"]
+end
+subgraph SKJ["<b>Skipjack MP</b>"]
+direction TB
+skj1["SSB<sub>SKJ</sub>"]
+skj2["TAC<sub>SKJ</sub>"]
+skj3["QS<sub>f,SKJ</sub>"]
+skj4["Quota<sub>f,SKJ</sub>"]
+end
+subgraph YFT["<b>Yellowfin MP</b>"]
+direction TB
+yft1["SSB<sub>YFT</sub>"]
+yft2["TAC<sub>YFT</sub>"]
+yft3["QS<sub>f,YFT</sub>"]
+yft4["Quota<sub>f,YFT</sub>"]
+end
+bet5["E<sub>f,BET</sub>"]
+skj5["E<sub>f,SKJ</sub>"]
+yft5["E<sub>f,YFT</sub>"]
+HCR["E<sub>f</sub>=min(E<sub>f,BET</sub>,E<sub>f,SKJ</sub>,E<sub>f,YFT</sub>)"]
+bet7["Catch<sub>f,BET</sub>"]
+skj7["Catch<sub>f,SKJ</sub>"]
+yft7["Catch<sub>f,YFT</sub>"]
+
+bet1 --HCR<sub>BET</sub>--> bet2 --> bet4
+bet3 --> bet4 --> bet5
+bet5 --> HCR
+skj1 --HCR<sub>SKJ</sub>--> skj2 --> skj4
+skj3 --> skj4 --> skj5
+skj5 --> HCR
+yft1 --HCR<sub>YFT</sub>--> yft2 --> yft4
+yft3 --> yft4 --> yft5 
+yft5 --> HCR
+HCR --> bet7
+HCR --> skj7
+HCR --> yft7
+style BET fill:#ffffff
+  style bet1 opacity:0.5,fill:#dca06d
+  style bet2 opacity:0.5,fill:#dca06d
+  style bet3 opacity:0.5,fill:#dca06d
+  style bet4 opacity:0.5,fill:#dca06d
+  style bet5 opacity:0.5,fill:#dca06d
+  style bet7 opacity:0.5,fill:#dca06d
+  style SKJ fill:#ffffff
+  style skj1 opacity:0.5,fill:#a55b4b
+  style skj2 opacity:0.5,fill:#a55b4b
+  style skj3 opacity:0.5,fill:#a55b4b
+  style skj4 opacity:0.5,fill:#a55b4b
+  style skj5 opacity:0.5,fill:#a55b4b
+  style skj7 opacity:0.5,fill:#a55b4b
+  style YFT fill:#ffffff
+  style yft1 opacity:0.5,fill:#b184b3
+  style yft2 opacity:0.5,fill:#b184b3
+  style yft3 opacity:0.5,fill:#b184b3
+  style yft4 opacity:0.5,fill:#b184b3
+  style yft5 opacity:0.5,fill:#b184b3
+  style yft7 opacity:0.5,fill:#b184b3
+  style HCR fill:#ffffff
+  
+  %% Set all nodes to black text
+linkStyle default color:#000000
+  classDef blackText color:#000000;
+  class bet1,bet2,bet3,bet4,bet5,bet7,skj1,skj2,skj3,skj4,skj5,skj7,yft1,yft2,yft3,yft4,yft5,yft7,HCR,BET,SKJ,YFT blackText;
+```
