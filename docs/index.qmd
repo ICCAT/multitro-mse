@@ -1,11 +1,42 @@
 ---
-title: "Quarto-website-example"
+title: "Multi-Stock Atlantic Tropical Tunas MSE"
+format:
+  html:
+    toc: true
+    mainfont: Helvetica
+    toc-location: left
+    page-layout: full
+number-sections: true
+number-depth: 4
+title-block-banner: "#000000"
+title-block-banner-color: "#FFFFFF"
+css: azti.css
+embed-resources: true
+html-table-processing: none
+theme:
+  - azti.scss
 ---
 
-This is a Quarto website.
+## Introduction
 
-To learn more about Quarto websites visit <https://quarto.org/docs/websites>.
+Welcome to the Multi-Stock Atlantic Tropical Tunas (TROP) MSE homepage. The tropical tuna stocks included in this MSE are: bigeye (BET, *Thunnus obesus*), yellowfin (YFT, *Thunnus albacares*), and skipjack (SKJ, *Katsuwonus pelamis*). 
 
-```{r}
-1 + 1
-```
+This site contains links to documents, reports, and presentations related to the management strategy evaluation (MSE) process.
+
+The MSE is being conducted with the open-source [FLBEIA](https://github.com/flr/FLBEIA) framework. The code for the TROP MSE is available in the [MSE GitHub repository](https://github.com/ICCAT/multitro-mse).
+
+## MSE Trial Specification Document
+
+This document describes the specifications for the operating models (OMs), candidate management procedures (CMPs), and performance indicators (PIs) that have been proposed and developed for the TROP MSE. It is a living document and will be continued to be updated so that it reflects the current state of MSE process.
+
+The document can be found [here](https://iccat.github.io/multitro-mse/TechSpec/Trial_Specs.html).
+
+## MSE Shiny App with Results
+
+This application presents the main MSE results by using the FLBEIA Shiny App, and can be found [here](https://aztigps.shinyapps.io/shiny-flbeia/?dataset=TT).
+
+In addition, exploratory scenarios following a single-stock MSE approach can be found at:
+
+- [BET results](https://aztigps.shinyapps.io/shiny-flbeia/?dataset=BET)
+- [YFT results](https://aztigps.shinyapps.io/shiny-flbeia/?dataset=YFT)
+- [SKJ results](https://aztigps.shinyapps.io/shiny-flbeia/?dataset=SKJ)

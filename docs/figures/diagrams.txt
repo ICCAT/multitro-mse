@@ -1,0 +1,370 @@
+## MSE FRAMEWORK
+
+%%{init: {
+  "themeVariables": {
+    "fontSize": "22px"
+  }
+}}%%
+
+flowchart TB
+    subgraph B1[" "]
+        direction TB
+        i1["Biological and <br> fishery model"]
+        f1["Data generation <br> (Observation Error Model, OEM)"]
+        t1["Operating model (OM)"]:::titleBottom
+    end
+
+    subgraph B2[" "]
+        direction RL
+        i2["Estimation method"] 
+        f2["Harvest control rule (HCR)"]
+        f3["Total Allowable Catch (TAC)"]
+        t2["Management Procedure (MP)"]:::titleBottom
+    end
+    f1 --> i2
+    f2 --> f3 --Implementation--> i1
+    i1 --> f1
+    i2 --> f2
+    B1 --> i3["Performance indicators (PIs)"]
+    style B1 fill:#d4f5ba
+    style B2 fill:#b9c8fc
+    style i3 fill:#fcf7b9
+    style i1 fill:#ffffff
+    style f1 fill:#ffffff
+    style i2 fill:#ffffff
+    style f2 fill:#ffffff
+    style f3 fill:#ffffff
+    
+    %% Set all nodes to black text
+    linkStyle default color:#000000
+    classDef blackText color:#000000;
+    class i1,f1,i2,f2,f3,i3,B1,B2 blackText;
+    style i2 stroke-dasharray: 5 5
+    classDef titleBottom fill:none,stroke:none,color:#000,font-weight:bold;
+
+## MSE RUNS
+
+%%{
+  init: {
+    'theme': 'default',
+    'themeVariables': {
+      'sectionBkgColor': '#dca06d',
+      'altSectionBkgColor': '#a55b4b',
+      'sectionBkgColor2': '#b184b3',
+      'taskBkgColor': 'lightgrey',
+      'taskBorderColor': 'black',
+      'taskTextColor': 'black',
+      'activeTaskBkgColor': 'white',
+      'activeTaskBorderColor': 'black',
+      'doneTaskBkgColor': 'lightgrey',
+      'doneTaskBorderColor': 'black'
+    }
+  }
+}%%
+
+gantt
+    dateFormat  YYYY-MM-DD
+    section Bigeye
+    End of historical period :done, a1, 2017-01-01, 3y
+    Initial runs     :active, a2, after a1  , 3y
+    Start of simulation period:after a2, 6y
+    section Skipjack
+    End of historical period :done, b1, 2017-01-01, 4y
+    Initial runs     :active, b2, after b1  , 2y
+    Start of simulation period:after b2, 6y
+    section Yellowfin
+    End of historical period :done, c1, 2017-01-01, 6y
+    Start of simulation period:after c1, 6y
+    todayMarker off
+
+
+## TIMELINE HCR:
+
+%%{init: {
+  "themeVariables": {
+    "fontSize": "23px",
+    "timelineFontSize": "20px"
+  }
+}}%%
+
+timeline
+    section Previous Management Periods
+        ... : Data available for MP
+    section Current <br> Management Period (t)
+        y-2 : Data available for MP
+        y-1 : Data available for MP
+        y (present) : Run MP
+    section Next <br> Management Period (t+1)
+        y+1 : Apply TAC from MP
+        y+2 : Apply TAC from MP
+        y+3 : Apply TAC from MP
+
+
+# Emin HCR:
+
+flowchart TB
+    subgraph BET["<b>Bigeye MP</b>"]
+        direction TB
+        bet1["HCR<sub>BET</sub>&nbsp&nbsp"]
+        bet2["TAC<sub>BET</sub>&nbsp"]
+        bet3["QS<sub>f,BET</sub>&nbsp"]
+        bet4["Quota<sub>f,BET</sub>&nbsp"]
+    end
+    subgraph SKJ["<b>Skipjack MP</b>"]
+    direction TB
+        skj1["HCR<sub>SKJ</sub>&nbsp"]
+        skj2["TAC<sub>SKJ</sub>&nbsp"]
+        skj3["QS<sub>f,SKJ</sub>&nbsp"]
+        skj4["Quota<sub>f,SKJ</sub>&nbsp"]
+    end
+    subgraph YFT["<b>Yellowfin MP</b>"]
+    direction TB
+        yft1["HCR<sub>YFT</sub>&nbsp"]
+        yft2["TAC<sub>YFT</sub>&nbsp"]
+        yft3["QS<sub>f,YFT</sub>&nbsp"]
+        yft4["Quota<sub>f,YFT</sub>&nbsp"]
+    end
+    bet5["E<sub>f,BET</sub>&nbsp"]
+    skj5["E<sub>f,SKJ</sub>&nbsp"]
+    yft5["E<sub>f,YFT</sub>&nbsp"]
+    HCR["E<sub>f,min</sub>=min(E<sub>f,BET</sub>,E<sub>f,SKJ</sub>,E<sub>f,YFT</sub>)&nbsp&nbsp&nbsp"]:::titleBottom
+    bet6["F<sub>f,BET</sub>=q<sub>f,BET</sub>E<sub>f,min</sub>&nbsp&nbsp"]
+    skj6["F<sub>f,SKJ</sub>=q<sub>f,SKJ</sub>E<sub>f,min</sub>&nbsp&nbsp"]
+    yft6["F<sub>f,YFT</sub>=q<sub>f,YFT</sub>E<sub>f,min</sub>&nbsp&nbsp"]
+    bet7["Catch<sub>f,BET</sub>&nbsp"]
+    skj7["Catch<sub>f,SKJ</sub>&nbsp"]
+    yft7["Catch<sub>f,YFT</sub>&nbsp"]
+
+    bet1 --> bet2 --> bet4
+    bet3 --> bet4 --> bet5
+    bet5 --> HCR
+    skj1 --> skj2 --> skj4
+    skj3 --> skj4 --> skj5
+    skj5 --> HCR
+    yft1 --> yft2 --> yft4
+    yft3 --> yft4 --> yft5 
+    yft5 --> HCR
+    bet6 --> bet7
+    skj6 --> skj7
+    yft6 --> yft7
+    HCR --> bet6
+    HCR --> skj6
+    HCR --> yft6
+    style BET fill:#ffffff
+    style bet1 opacity:0.5,fill:#dca06d
+    style bet2 opacity:0.5,fill:#dca06d
+    style bet3 opacity:0.5,fill:#dca06d
+    style bet4 opacity:0.5,fill:#dca06d
+    style bet5 opacity:0.5,fill:#dca06d
+    style bet6 opacity:0.5,fill:#dca06d
+    style bet7 opacity:0.5,fill:#dca06d
+    style SKJ fill:#ffffff
+    style skj1 opacity:0.5,fill:#a55b4b
+    style skj2 opacity:0.5,fill:#a55b4b
+    style skj3 opacity:0.5,fill:#a55b4b
+    style skj4 opacity:0.5,fill:#a55b4b
+    style skj5 opacity:0.5,fill:#a55b4b
+    style skj6 opacity:0.5,fill:#a55b4b
+    style skj7 opacity:0.5,fill:#a55b4b
+    style YFT fill:#ffffff
+    style yft1 opacity:0.5,fill:#b184b3
+    style yft2 opacity:0.5,fill:#b184b3
+    style yft3 opacity:0.5,fill:#b184b3
+    style yft4 opacity:0.5,fill:#b184b3
+    style yft5 opacity:0.5,fill:#b184b3
+    style yft6 opacity:0.5,fill:#b184b3
+    style yft7 opacity:0.5,fill:#b184b3
+    style HCR fill:#ffffff
+    
+    %% Set all nodes to black text
+    linkStyle default color:#000000
+    classDef blackText color:#000000,font-size:18px;
+    class bet1,bet2,bet3,bet4,bet5,bet6,bet7,skj1,skj2,skj3,skj4,skj5,skj6,skj7,yft1,yft2,yft3,yft4,yft5,yft6,yft7,BET,SKJ,YFT blackText;
+    classDef titleBottom fill:none,stroke:none,color:#000;
+
+	
+# EMIX HCR:
+
+flowchart TB
+    subgraph BET["<b>Bigeye MP</b>"]
+        direction TB
+        bet1["HCR<sub>BET</sub>&nbsp&nbsp"]
+        bet2["TAC<sub>BET</sub>&nbsp"]
+        bet3["QS<sub>f,BET</sub>&nbsp"]
+        bet4["Quota<sub>f,BET</sub>&nbsp"]
+    end
+    subgraph SKJ["<b>Skipjack MP</b>"]
+    direction TB
+        skj1["HCR<sub>SKJ</sub>&nbsp"]
+        skj2["TAC<sub>SKJ</sub>&nbsp"]
+        skj3["QS<sub>f,SKJ</sub>&nbsp"]
+        skj4["Quota<sub>f,SKJ</sub>&nbsp"]
+    end
+    subgraph YFT["<b>Yellowfin MP</b>"]
+    direction TB
+        yft1["HCR<sub>YFT</sub>&nbsp"]
+        yft2["TAC<sub>YFT</sub>&nbsp"]
+        yft3["QS<sub>f,YFT</sub>&nbsp"]
+        yft4["Quota<sub>f,YFT</sub>&nbsp"]
+    end
+    bet5["E<sub>f,BET</sub>&nbsp"]
+    skj5["E<sub>f,SKJ</sub>&nbsp"]
+    yft5["E<sub>f,YFT</sub>&nbsp"]
+    HCR["E<sub>f,min</sub>=min(E<sub>f,BET</sub>,E<sub>f,SKJ</sub>,E<sub>f,YFT</sub>)&nbsp&nbsp&nbsp"]:::titleBottom
+    bet6["F<sub>f,BET</sub>=D<sub>f,BET</sub>q<sub>f,BET</sub>E<sub>f,min</sub>&nbsp&nbsp&nbsp"]
+    skj6["F<sub>f,SKJ</sub>=D<sub>f,SKJ</sub>q<sub>f,SKJ</sub>E<sub>f,min</sub>&nbsp&nbsp&nbsp"]
+    yft6["F<sub>f,YFT</sub>=D<sub>f,YFT</sub>q<sub>f,YFT</sub>E<sub>f,min</sub>&nbsp&nbsp&nbsp"]
+    bet7["Catch<sub>f,BET</sub>&nbsp"]
+    skj7["Catch<sub>f,SKJ</sub>&nbsp"]
+    yft7["Catch<sub>f,YFT</sub>&nbsp"]
+
+    bet1 --> bet2 --> bet4
+    bet3 --> bet4 --> bet5
+    bet5 --> HCR
+    skj1 --> skj2 --> skj4
+    skj3 --> skj4 --> skj5
+    skj5 --> HCR
+    yft1 --> yft2 --> yft4
+    yft3 --> yft4 --> yft5 
+    yft5 --> HCR
+    bet6 --> bet7
+    skj6 --> skj7
+    yft6 --> yft7
+    HCR --> bet6
+    HCR --> skj6
+    HCR --> yft6
+    style BET fill:#ffffff
+    style bet1 opacity:0.5,fill:#dca06d
+    style bet2 opacity:0.5,fill:#dca06d
+    style bet3 opacity:0.5,fill:#dca06d
+    style bet4 opacity:0.5,fill:#dca06d
+    style bet5 opacity:0.5,fill:#dca06d
+    style bet6 opacity:0.5,fill:#dca06d
+    style bet7 opacity:0.5,fill:#dca06d
+    style SKJ fill:#ffffff
+    style skj1 opacity:0.5,fill:#a55b4b
+    style skj2 opacity:0.5,fill:#a55b4b
+    style skj3 opacity:0.5,fill:#a55b4b
+    style skj4 opacity:0.5,fill:#a55b4b
+    style skj5 opacity:0.5,fill:#a55b4b
+    style skj6 opacity:0.5,fill:#a55b4b
+    style skj7 opacity:0.5,fill:#a55b4b
+    style YFT fill:#ffffff
+    style yft1 opacity:0.5,fill:#b184b3
+    style yft2 opacity:0.5,fill:#b184b3
+    style yft3 opacity:0.5,fill:#b184b3
+    style yft4 opacity:0.5,fill:#b184b3
+    style yft5 opacity:0.5,fill:#b184b3
+    style yft6 opacity:0.5,fill:#b184b3
+    style yft7 opacity:0.5,fill:#b184b3
+    style HCR fill:#ffffff
+    
+    %% Set all nodes to black text
+    linkStyle default color:#000000
+    classDef blackText color:#000000,font-size:18px;
+    class bet1,bet2,bet3,bet4,bet5,bet6,bet7,skj1,skj2,skj3,skj4,skj5,skj6,skj7,yft1,yft2,yft3,yft4,yft5,yft6,yft7,BET,SKJ,YFT blackText;
+    classDef titleBottom fill:none,stroke:none,color:#000;
+	
+	
+	
+# BET HCR:
+
+flowchart LR
+    subgraph MSE["<b>Bigeye MSE</b>"]
+    subgraph MP["<b>MP</b>"]
+        direction TB
+        bet1["HCR&nbsp"]
+        bet2["TAC&nbsp"]
+        bet3["QS<sub>f</sub>&nbsp"]
+        bet4["Quota<sub>f</sub>&nbsp"]
+    end
+    bet5["E<sub>f</sub>&nbsp"]
+    bet6["F<sub>f</sub>=q<sub>f</sub>E<sub>f</sub>&nbsp"]
+    bet7["Catch<sub>f</sub>&nbsp"]
+    end
+
+    bet1 --> bet2 --> bet4
+    bet3 --> bet4 --> bet5
+    bet5 --> bet6 --> bet7
+    style MSE fill:#ffffff
+    style MP fill:#ffffff
+    style bet1 opacity:0.5,fill:#dca06d
+    style bet2 opacity:0.5,fill:#dca06d
+    style bet3 opacity:0.5,fill:#dca06d
+    style bet4 opacity:0.5,fill:#dca06d
+    style bet5 opacity:0.5,fill:#dca06d
+    style bet6 opacity:0.5,fill:#dca06d
+    style bet7 opacity:0.5,fill:#dca06d
+    
+    %% Set all nodes to black text
+    linkStyle default color:#000000
+    classDef blackText color:#000000,font-size:18px;
+    class bet1,bet2,bet3,bet4,bet5,bet6,bet7,MP,MSE blackText;
+	
+# SKJ HCR:
+
+flowchart LR
+    subgraph MSE["<b>Skipjack MSE</b>&nbsp"]
+    subgraph MP["<b>MP</b>"]
+        direction TB
+        bet1["HCR&nbsp"]
+        bet2["TAC&nbsp"]
+        bet3["QS<sub>f</sub>&nbsp"]
+        bet4["Quota<sub>f</sub>&nbsp"]
+    end
+    bet5["E<sub>f</sub>&nbsp"]
+    bet6["F<sub>f</sub>=q<sub>f</sub>E<sub>f</sub>&nbsp"]
+    bet7["Catch<sub>f</sub>&nbsp"]
+    end
+
+    bet1 --> bet2 --> bet4
+    bet3 --> bet4 --> bet5
+    bet5 --> bet6 --> bet7
+    style MSE fill:#ffffff
+    style MP fill:#ffffff
+    style bet1 opacity:0.5,fill:#a55b4b
+    style bet2 opacity:0.5,fill:#a55b4b
+    style bet3 opacity:0.5,fill:#a55b4b
+    style bet4 opacity:0.5,fill:#a55b4b
+    style bet5 opacity:0.5,fill:#a55b4b
+    style bet6 opacity:0.5,fill:#a55b4b
+    style bet7 opacity:0.5,fill:#a55b4b
+    
+    %% Set all nodes to black text
+    linkStyle default color:#000000
+    classDef blackText color:#000000,font-size:18px;
+    class bet1,bet2,bet3,bet4,bet5,bet6,bet7,MP,MSE blackText;
+	
+# YFT HCR
+
+flowchart LR
+    subgraph MSE["<b>Yellowfin MSE</b>&nbsp"]
+    subgraph MP["<b>MP</b>"]
+        direction TB
+        bet1["HCR&nbsp"]
+        bet2["TAC&nbsp"]
+        bet3["QS<sub>f</sub>&nbsp"]
+        bet4["Quota<sub>f</sub>&nbsp"]
+    end
+    bet5["E<sub>f</sub>&nbsp"]
+    bet6["F<sub>f</sub>=q<sub>f</sub>E<sub>f</sub>&nbsp"]
+    bet7["Catch<sub>f</sub>&nbsp"]
+    end
+
+    bet1 --> bet2 --> bet4
+    bet3 --> bet4 --> bet5
+    bet5 --> bet6 --> bet7
+    style MSE fill:#ffffff
+    style MP fill:#ffffff
+    style bet1 opacity:0.5,fill:#b184b3
+    style bet2 opacity:0.5,fill:#b184b3
+    style bet3 opacity:0.5,fill:#b184b3
+    style bet4 opacity:0.5,fill:#b184b3
+    style bet5 opacity:0.5,fill:#b184b3
+    style bet6 opacity:0.5,fill:#b184b3
+    style bet7 opacity:0.5,fill:#b184b3
+    
+    %% Set all nodes to black text
+    linkStyle default color:#000000
+    classDef blackText color:#000000,font-size:18px;
+    class bet1,bet2,bet3,bet4,bet5,bet6,bet7,MP,MSE blackText;

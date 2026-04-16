@@ -6,9 +6,10 @@ require(gridExtra)
 require(sf)
 library(stringr)
 require(rnaturalearthdata)
+require(magick)
 require(rnaturalearth)
 source('sharepoint_path.R')
-fig_dir = 'docs/TechSpec/figures'
+fig_dir = 'docs/figures'
 dir.create(file.path(fig_dir, 'BET'), showWarnings = FALSE)
 dir.create(file.path(fig_dir, 'SKJ'), showWarnings = FALSE)
 dir.create(file.path(fig_dir, 'YFT'), showWarnings = FALSE)
@@ -181,6 +182,80 @@ ggsave(filename = file.path(fig_dir, 'OEM_stock.png'), plot = p1,
        width = 150, height = 85, units = "mm", dpi = 300)
 
 # -------------------------------------------------------------------------
+# Pseudoconstant Catch MP:
+
+p1 = ggplot() +
+  geom_blank(aes(x = c(0, 10), y = c(0, 10))) +
+  geom_segment(aes(x = 0, y = 0, xend = 1, yend = 1), linewidth = 1) +
+  geom_segment(aes(x = 1, y = 1, xend = 10, yend = 1), linewidth = 1) +
+  geom_segment(aes(x = 1, y = 1, xend = 1, yend = 0), linewidth = 0.5, color = "red", linetype = "dashed", alpha = 0.5) +
+  geom_segment(aes(x = 1, y = 1, xend = 0, yend = 1), linewidth = 0.5, color = "red", linetype = "dashed", alpha = 0.5) +
+  annotate("text", x = 1.25, y = 0.5, label = expression("~f("*TAC[ct]*")")) +
+  geom_curve(
+    aes(x = 1.25, y = 0.47, xend = 0.42, yend = 0.4),
+    curvature = -0.3, arrow = arrow(length = unit(0.2, "cm")), linewidth = 0.5 ) +
+  scale_x_continuous(breaks = c(0, 1), labels = c("0", expression(I[ref]))) +
+  scale_y_continuous(breaks = c(0, 1), labels = c("0", expression(TAC[ct]))) +
+  coord_cartesian(xlim = c(0,1.5), ylim = c(0,1.2), expand = c(0,0)) +
+  theme_classic() +
+  ylab(expression(TAC["t+1"])) + xlab(expression(I[G]))
+ggsave(filename = file.path(fig_dir, 'pccatch.png'), plot = p1, 
+       width = 80, height = 70, units = "mm", dpi = 300)
+
+# -------------------------------------------------------------------------
+# Index-based MP:
+
+p1 = ggplot() +
+  geom_blank(aes(x = c(0, 10), y = c(0, 10))) +
+  geom_segment(aes(x = 1, y = 1, xend = 10, yend = 1), linewidth = 1) +
+  geom_segment(aes(x = 0.75, y = 0.5, xend = 1, yend = 1), linewidth = 1) +
+  geom_segment(aes(x = 0.25, y = 0.5, xend = 0.75, yend = 0.5), linewidth = 1) +
+  geom_segment(aes(x = 0, y = 0, xend = 0.25, yend = 0.5), linewidth = 1) +
+  geom_segment(aes(x = 0, y = 1, xend = 1, yend = 1), linewidth = 0.5, color = "red", linetype = "dashed", alpha = 0.5) +
+  geom_segment(aes(x = 0.75, y = 0, xend = 0.75, yend = 0.5), linewidth = 0.5, color = "red", linetype = "dashed", alpha = 0.5) +
+  geom_segment(aes(x = 0.25, y = 0, xend = 0.25, yend = 0.5), linewidth = 0.5, color = "red", linetype = "dashed", alpha = 0.5) +
+  annotate("text", x = 1.1, y = 0.45, label = expression("~f("*TAC[t]*")")) +
+  geom_curve(
+    aes(x = 1.1, y = 0.4, xend = 0.55, yend = 0.48),
+    curvature = -0.3, arrow = arrow(length = unit(0.2, "cm")), linewidth = 0.5 ) +
+  scale_x_continuous(breaks = c(0, 0.25, 0.75), labels = c("0", expression("1-"*alpha), expression("1+"*alpha))) +
+  scale_y_continuous(breaks = c(0, 1), labels = c("0", expression(TAC[max]))) +
+  coord_cartesian(xlim = c(0,1.5), ylim = c(0,1.2), expand = c(0,0)) +
+  theme_classic() +
+  ylab(expression(TAC["t+1"])) + xlab(expression(I[G]))
+ggsave(filename = file.path(fig_dir, 'index_based.png'), plot = p1, 
+       width = 80, height = 70, units = "mm", dpi = 300)
+
+
+# -------------------------------------------------------------------------
+# D factor in F calculation (Emix approach):
+df_plot = data.frame(x = seq(from = 1, to = 4, by = 0.25))
+df_plot = df_plot %>% mutate(y = (1+x)/2)
+
+p1 = ggplot(data = df_plot, aes(x = x, y = y)) +
+  geom_line() +
+  coord_cartesian(xlim = c(1, NA), ylim = c(1, NA), expand = c(0,0)) +
+  theme_classic() +
+  ylab(expression(D["f,STOCK"])) + xlab(expression(over(E["f,STOCK"],"E"["f,min"])))
+ggsave(filename = file.path(fig_dir, 'D_derivation.png'), plot = p1, 
+       width = 80, height = 70, units = "mm", dpi = 300)
+
+
+# -------------------------------------------------------------------------
+# Merge single stock MSE diagrams:
+
+img <- image_read(c(
+  file.path(fig_dir, "HCR_BET.png"),
+  file.path(fig_dir, "HCR_SKJ.png"),
+  file.path(fig_dir, "HCR_YFT.png")
+))
+
+merged <- image_append(img)  # horizontal by default
+image_write(merged, file.path(fig_dir, "HCR_single.png"))
+
+
+
+# -------------------------------------------------------------------------
 # Figure HCR example:
 p1 = ggplot(data = datapoly, aes(x = x, y = y)) +
   geom_polygon(aes(fill = factor(id), group = factor(id)), alpha = 0.45) +
@@ -207,17 +282,13 @@ ggsave(filename = file.path(fig_dir, 'hcr_example.png'), plot = p1,
 
 # -------------------------------------------------------------------------
 # Figure HCR by case:
-f_vec = c(0.8, 1, 1.2)
-b_vec = c(0.8, 1, 1.2)
-mydat = as.data.frame(expand.grid(ffmsy = f_vec, bbmsy = b_vec))
-mydat = mydat %>% mutate(bbmsy_t = factor(bbmsy, levels = b_vec, 
-                                        labels = c(expression("0.8"*B[msy]),
-                                                   expression(B[msy]),
-                                                   expression("1.2"*B[msy]))),
-                         ffmsy_t = factor(ffmsy, levels = f_vec, 
-                                        labels = c(expression("0.8"*F[msy]),
-                                                   expression(F[msy]),
-                                                   expression("1.2"*F[msy]))))
+mydat = as.data.frame(expand.grid(ffmsy = c(0.8, 0.9, 1), bbmsy = c(1)))
+mydat = mydat %>% mutate(bbmsy_t = factor(bbmsy, levels = c(1), 
+                                          labels = c(expression(B[thr]*"="*B[msy]))),
+                         ffmsy_t = factor(ffmsy, levels = c(0.8, 0.9, 1), 
+                                          labels = c(expression(F[tgt]*"=0.8"*F[msy]),
+                                                     expression(F[tgt]*"=0.9"*F[msy]),
+                                                     expression(F[tgt]*"="*F[msy]))))
 
 p2 = ggplot(data = datapoly, aes(x = x, y = y)) +
   geom_polygon(aes(fill = factor(id), group = factor(id)), alpha = 0.45) +
@@ -233,15 +304,14 @@ p2 = ggplot(data = datapoly, aes(x = x, y = y)) +
         legend.background = element_rect(fill='transparent'),
         panel.grid.major = element_blank(), 
         panel.grid.minor = element_blank(),
-		axis.text = element_text(size = 10),
+        axis.text = element_text(size = 10),
         strip.text = element_text(size = 12),
         strip.background = element_blank()) +
   guides(fill = 'none') +
   scale_fill_manual(values = c('#8cff66', '#ffff00', '#ff3300', '#ff9900')) +
   facet_grid(ffmsy_t ~ bbmsy_t, labeller = label_parsed )
-ggsave(filename = file.path(fig_dir, 'hcr_combs.png'), plot = p2, 
-       width = 170, height = 170, units = "mm", dpi = 300)
-
+ggsave(filename = file.path(fig_dir, 'hcr_combs_2.png'), plot = p2, 
+       width = 85, height = 130, units = "mm", dpi = 300)
 
 # -------------------------------------------------------------------------
 # Figure for performance metrics example:
@@ -286,12 +356,12 @@ p1 = ggplot(data = exvec, aes(x = Yr_sim, y = Bio_all)) +
            size = 3, color = 'blue')
 
 p2 = ggplot(data = exvec, aes(x = Yr_sim, y = Bio_all)) +
-    geom_line() + geom_point() +
-    geom_hline(yintercept = mean(exvec$Bio_all), color = 'blue') +
-    theme_bw() + ylab(expression(B/B[msy])) + xlab(x_lab) +
-    theme(axis.text.y=element_blank(), axis.ticks.y=element_blank(),
-          axis.text.x=element_blank(), axis.ticks.x=element_blank()) +
-    annotate("text", x = 15, y = 1.8, label = "meanB", 
+  geom_line() + geom_point() +
+  geom_hline(yintercept = mean(exvec$Bio_all), color = 'blue') +
+  theme_bw() + ylab(expression(B/B[msy])) + xlab(x_lab) +
+  theme(axis.text.y=element_blank(), axis.ticks.y=element_blank(),
+        axis.text.x=element_blank(), axis.ticks.x=element_blank()) +
+  annotate("text", x = 15, y = 1.8, label = "meanB", 
            size = 3, color = 'blue')
 
 p3 = ggplot(data = exvec, aes(x = Yr_sim, y = Fval)) +
@@ -320,7 +390,7 @@ p4 = ggplot(data = datapoly, aes(x = x, y = y)) +
         strip.background = element_blank()) +
   guides(fill = 'none') +
   scale_fill_manual(values = c('#8cff66', '#ffff00', '#ff3300', '#ff9900')) +
-  annotate("text", x = 1, y = 1.9, label = "pGreen",  size = 3, color = 'blue')
+  annotate("text", x = 1, y = 1.9, label = "PGK",  size = 3, color = 'blue')
 
 p5 = ggplot(data = datapoly, aes(x = x, y = y)) +
   geom_polygon(aes(fill = factor(id), group = factor(id)), alpha = 0.45) +
@@ -339,7 +409,7 @@ p5 = ggplot(data = datapoly, aes(x = x, y = y)) +
         strip.background = element_blank()) +
   guides(fill = 'none') +
   scale_fill_manual(values = c('#8cff66', '#ffff00', '#ff3300', '#ff9900')) +
-  annotate("text", x = 1, y = 1.9, label = "pRed",  size = 3, color = 'blue')
+  annotate("text", x = 1, y = 1.9, label = "PGR",  size = 3, color = 'blue')
 
 # Merge status plots:
 merged_plot = grid.arrange(p1, p2, p3, p4, p5, ncol = 3)
@@ -355,9 +425,9 @@ p6 = ggplot(data = exvec, aes(x = Yr_sim, y = Bio_all)) +
   scale_y_continuous(breaks = Blim, labels = expression(B[lim])) +
   theme(legend.position = 'none',
         axis.text.x=element_blank(), axis.ticks.x=element_blank()) +
-  annotate("text", x = 15, y = 1.8, label = "pBlim", 
+  annotate("text", x = 15, y = 1.8, label = "PBlim", 
            size = 3, color = 'blue')
- 
+
 p7 = ggplot(data = exvec, aes(x = Yr_sim, y = Bio_all)) +
   geom_line() + geom_point(aes(color = pbmsy)) +
   geom_hline(yintercept = Blim, linetype = 'dashed', color = 'gray60') +
@@ -367,7 +437,7 @@ p7 = ggplot(data = exvec, aes(x = Yr_sim, y = Bio_all)) +
   scale_y_continuous(breaks = c(Blim, Bmsy), labels = c(expression(B[lim]), expression(B[msy]))) +
   theme(legend.position = 'none',
         axis.text.x=element_blank(), axis.ticks.x=element_blank()) +
-  annotate("text", x = 15, y = 1.8, label = "pBmsy", 
+  annotate("text", x = 15, y = 1.8, label = "PBmsy", 
            size = 3, color = 'blue')
 
 # Merge safety plots:
@@ -378,34 +448,37 @@ ggsave(filename = file.path(fig_dir, 'safety_ex.png'), plot = merged_plot,
 
 # Yield:
 # add noise to catch:
-p8 = ggplot(data = exvec, aes(x = Yr_sim, y = Fval)) +
+tac_period = 3
+set.seed(123)
+exvec = exvec %>% mutate(catch = rep(rnorm(10, mean = 2), each = tac_period))
+p8 = ggplot(data = exvec, aes(x = Yr_sim, y = catch)) +
   geom_line() + geom_point() +
-  geom_segment(x = 1, xend = 3, y = mean(exvec$Fval[1:3]), yend = mean(exvec$Fval[1:3]), 
+  geom_segment(x = 1, xend = 3, y = mean(exvec$catch[1:3]), yend = mean(exvec$catch[1:3]), 
                color = 'blue') +
   theme_bw() + ylab("Catch (t)") + xlab(x_lab) +
   theme(axis.text.y=element_blank(), axis.ticks.y=element_blank(),
         axis.text.x=element_blank(), axis.ticks.x=element_blank()) +
-  annotate("text", x = 15, y = 1.8, label = "Csht", 
+  annotate("text", x = 15, y = 4, label = "Cstr", 
            size = 3, color = 'blue', parse = TRUE)
 
-p9 = ggplot(data = exvec, aes(x = Yr_sim, y = Fval)) +
+p9 = ggplot(data = exvec, aes(x = Yr_sim, y = catch)) +
   geom_line() + geom_point() +
-  geom_segment(x = 5, xend = 10, y = mean(exvec$Fval[5:10]), yend = mean(exvec$Fval[5:10]), 
+  geom_segment(x = 5, xend = 10, y = mean(exvec$catch[5:10]), yend = mean(exvec$catch[5:10]), 
                color = 'blue') +
   theme_bw() + ylab("Catch (t)") + xlab(x_lab) +
   theme(axis.text.y=element_blank(), axis.ticks.y=element_blank(),
         axis.text.x=element_blank(), axis.ticks.x=element_blank()) +
-  annotate("text", x = 15, y = 1.8, label = "Cmed", 
+  annotate("text", x = 15, y = 4, label = "Cmed", 
            size = 3, color = 'blue', parse = TRUE)
 
-p10 = ggplot(data = exvec, aes(x = Yr_sim, y = Fval)) +
+p10 = ggplot(data = exvec, aes(x = Yr_sim, y = catch)) +
   geom_line() + geom_point() +
-  geom_segment(x = 15, xend = n_ts, y = mean(exvec$Fval[15:n_ts]), yend = mean(exvec$Fval[15:n_ts]), 
+  geom_segment(x = 15, xend = 25, y = mean(exvec$catch[15:25]), yend = mean(exvec$catch[15:25]), 
                color = 'blue') +
   theme_bw() + ylab("Catch (t)") + xlab(x_lab) +
   theme(axis.text.y=element_blank(), axis.ticks.y=element_blank(),
         axis.text.x=element_blank(), axis.ticks.x=element_blank()) +
-  annotate("text", x = 15, y = 1.8, label = "Clon", 
+  annotate("text", x = 15, y = 4, label = "Clon", 
            size = 3, color = 'blue', parse = TRUE)
 
 # Merge yield plots:
@@ -415,62 +488,61 @@ ggsave(filename = file.path(fig_dir, 'yield_ex.png'), plot = merged_plot,
 
 
 # Stability
-plot_df = exvec %>% select(Yr_sim, Fval)
+plot_df = exvec %>% select(Yr_sim, catch)
 plot_df$Yr_sim_end = NA
-plot_df$Fval_end = NA
+plot_df$catch_end = NA
 plot_df$Yr_sim_end[1:(nrow(plot_df)-1)] = plot_df$Yr_sim[2:nrow(plot_df)]
-plot_df$Fval_end[1:(nrow(plot_df)-1)] = plot_df$Fval[2:nrow(plot_df)]
+plot_df$catch_end[1:(nrow(plot_df)-1)] = plot_df$catch[2:nrow(plot_df)]
 plot_df2 = plot_df %>% na.omit
 
-p11 = ggplot(data = plot_df, aes(x = Yr_sim, y = Fval)) +
+p11 = ggplot(data = plot_df, aes(x = Yr_sim, y = catch)) +
   geom_point() +
-  geom_segment(data = plot_df2, aes(x = Yr_sim, xend = Yr_sim_end, y = Fval, yend = Fval_end), 
+  geom_segment(data = plot_df2, aes(x = Yr_sim, xend = Yr_sim_end, y = catch, yend = catch_end), 
                arrow = arrow(length = unit(0.15, "cm")), color = 'blue') +
   theme_bw() + ylab("Catch (t)") + xlab(x_lab) +
   theme(axis.text.y=element_blank(), axis.ticks.y=element_blank(),
         axis.text.x=element_blank(), axis.ticks.x=element_blank()) +
-  annotate("text", x = 15, y = 1.8, label = "Cc", 
+  annotate("text", x = 15, y = 4, label = "Cc", 
            size = 3, color = 'blue', parse = T)
 
-p12 = ggplot(data = plot_df, aes(x = Yr_sim, y = Fval)) +
+p12 = ggplot(data = plot_df, aes(x = Yr_sim, y = catch)) +
   geom_point() + geom_line() +
-  geom_segment(data = plot_df, aes(x = Yr_sim, xend = Yr_sim, y = mean(Fval), yend = Fval), 
+  geom_segment(data = plot_df, aes(x = Yr_sim, xend = Yr_sim, y = mean(catch), yend = catch), 
                color = 'blue') +
   theme_bw() + ylab("Catch (t)") + xlab(x_lab) +
-  geom_hline(yintercept = mean(plot_df$Fval), color = 'black') +
+  geom_hline(yintercept = mean(plot_df$catch), color = 'black') +
   theme(axis.text.y=element_blank(), axis.ticks.y=element_blank(),
         axis.text.x=element_blank(), axis.ticks.x=element_blank()) +
-  annotate("text", x = 15, y = 1.8, label = "Csd", 
+  annotate("text", x = 15, y = 4, label = "Csd", 
            size = 3, color = 'blue', parse = TRUE)
 
 plot_df3 = plot_df
-plot_df3$Fval[c(14:16)] = 0
-plot_df3 = plot_df3 %>% mutate(tac = if_else(Fval == 0, '0', '1'))
-p13 = ggplot(data = plot_df3, aes(x = Yr_sim, y = Fval)) +
+plot_df3$catch[c(22:24)] = 0
+plot_df3 = plot_df3 %>% mutate(tac = if_else(catch == 0, '0', '1'))
+p13 = ggplot(data = plot_df3, aes(x = Yr_sim, y = catch)) +
   geom_point(aes(color = tac)) + 
   scale_color_manual(values = c('0' = 'blue', '1' = 'gray40')) +
   theme_bw() + ylab("TAC (t)") + xlab(x_lab) +
   scale_y_continuous(breaks = 0) +
   theme(legend.position = 'none',
         axis.text.x=element_blank(), axis.ticks.x=element_blank()) +
-  annotate("text", x = 15, y = 1.8, label = "pShw", 
+  annotate("text", x = 15, y = 4, label = "PShw", 
            size = 3, color = 'blue')
 
-plot_df4 = exvec %>% select(Yr_sim, Fval)
-tac_period = 1
-plot_df4 = plot_df4[seq(from = 1, by = tac_period, length.out = nrow(plot_df4)/tac_period), ]
+plot_df4 = exvec %>% select(Yr_sim, catch)
+plot_df4 = plot_df4[seq(from = 2, by = tac_period, length.out = nrow(plot_df4)/tac_period), ]
 plot_df4$Yr_sim_end = NA
-plot_df4$Fval_end = NA
+plot_df4$catch_end = NA
 plot_df4$Yr_sim_end[1:(nrow(plot_df4)-1)] = plot_df4$Yr_sim[2:nrow(plot_df4)]
-plot_df4$Fval_end[1:(nrow(plot_df4)-1)] = plot_df4$Fval[2:nrow(plot_df4)]
+plot_df4$catch_end[1:(nrow(plot_df4)-1)] = plot_df4$catch[2:nrow(plot_df4)]
 plot_df4 = plot_df4 %>% na.omit
-plot_df4$diff = abs(plot_df4$Fval_end - plot_df4$Fval)
-plot_df4 = plot_df4 %>% mutate(diff_type = if_else(diff > 0.3, '1', '0'))
-p14 = ggplot(data = exvec, aes(x = Yr_sim, y = Fval)) +
+plot_df4$diff = abs(plot_df4$catch_end - plot_df4$catch)
+plot_df4 = plot_df4 %>% mutate(diff_type = if_else(diff > 1.3, '1', '0'))
+p14 = ggplot(data = exvec, aes(x = Yr_sim, y = catch)) +
   geom_point() + 
   geom_segment(data = plot_df4, 
                aes(x = Yr_sim, xend = Yr_sim_end, 
-                   y = Fval, yend = Fval_end,
+                   y = catch, yend = catch_end,
                    color = diff_type), 
                arrow = arrow(length = unit(0.15, "cm"))) +
   theme_bw() + ylab("TAC (t)") + xlab(x_lab) +
@@ -478,19 +550,19 @@ p14 = ggplot(data = exvec, aes(x = Yr_sim, y = Fval)) +
   theme(axis.text.y=element_blank(), axis.ticks.y=element_blank(), 
         axis.text.x=element_blank(), axis.ticks.x=element_blank(),
         legend.position = "none") +
-  annotate("text", x = 15, y = 1.8, label = "pTX", 
+  annotate("text", x = 15, y = 4, label = "PTcx", 
            size = 3, color = 'blue')
 
-p15 = ggplot(data = exvec, aes(x = Yr_sim, y = Fval)) +
+p15 = ggplot(data = exvec, aes(x = Yr_sim, y = catch)) +
   geom_point() + 
   geom_segment(data = plot_df4 %>% filter(which.max(diff) == row_number()), 
-               aes(x = Yr_sim, xend = Yr_sim_end, y = Fval, yend = Fval_end), 
+               aes(x = Yr_sim, xend = Yr_sim_end, y = catch, yend = catch_end), 
                arrow = arrow(length = unit(0.15, "cm")), color = 'blue') +
   theme_bw() + ylab("TAC (t)") + xlab(x_lab) +
   scale_x_continuous(breaks = seq(10, 30, 10)) +
   theme(axis.text.y=element_blank(), axis.ticks.y=element_blank(),
         axis.text.x=element_blank(), axis.ticks.x=element_blank()) +
-  annotate("text", x = 15, y = 1.8, label = "maxTc", 
+  annotate("text", x = 15, y = 4, label = "Tcmax", 
            size = 3, color = 'blue', parse = T)
 
 # Merge stability plots:
