@@ -218,7 +218,7 @@ p1 = ggplot() +
   geom_curve(
     aes(x = 1.1, y = 0.4, xend = 0.55, yend = 0.48),
     curvature = -0.3, arrow = arrow(length = unit(0.2, "cm")), linewidth = 0.5 ) +
-  scale_x_continuous(breaks = c(0, 0.25, 0.75), labels = c("0", expression("1-"*alpha), expression("1+"*alpha))) +
+  scale_x_continuous(breaks = c(0, 0.25, 0.75), labels = c("0", expression("(1-"*alpha*")"*I[ref]), expression("(1+"*alpha*")"*I[ref]))) +
   scale_y_continuous(breaks = c(0, 1), labels = c("0", expression(TAC[max]))) +
   coord_cartesian(xlim = c(0,1.5), ylim = c(0,1.2), expand = c(0,0)) +
   theme_classic() +

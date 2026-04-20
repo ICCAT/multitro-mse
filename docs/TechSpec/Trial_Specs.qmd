@@ -322,7 +322,7 @@ The management advice is given every three years (*management period*) and the t
 
 ![Representation of the TAC calculation for the next management period.](../figures/mp_timeline.png){#fig-timeline}
 
-### Pseudo-constant catch
+### Pseudo-constant catch {#sec-mp-pcc}
 
 The total allowable catch (TAC) for the next management period ($t+1$) is assumed constant, unless a reference value ($I_{G}$) derived from a group of indices of abundance in the last two years falls below a reference value $I_{ref}$:
 
@@ -332,23 +332,19 @@ TAC_{ct}, & \text{if }I_{G} \geq I_{ref} \\
 TAC_{ct}(\frac{I_{G}}{I_{ref}}), & \text{if }I_{G} < I_{ref}
 \end{cases}$$
 
-$I_{G}$ was calculated as follows:
+$I_{G}$ was calculated using index of abundance information ($I$) from the previous two years ($y-1$ and $y-2$):
 
-$$I_G = exp(\frac{1}{n_i}\sum_{i}log(I^*_i))$$
-
-where $n_i$ is the number of selected indices of abundance and $I^*_i$ was calculated for every selected index of abundance $I_i$ using information from the last two years ($y-1$ and $y-2$):
-
-$$I^*_i = \frac{I_{i,y-1}+I_{i,y-2}}{2}$$
+$$I_G = \frac{I_{y-1}+I_{y-2}}{2}$$
 
 In addition, the TAC variation between consecutive management periods $TAC_{t+1}$ and $TAC_{t}$ could not exceed 5% when $I_G < I_{ref}$.
 
 @fig-pcc shows a representation of this HCR and @tbl-par-pcc shows the HCR parameters used for each stock.
 
-| Stock | $I_{ref}$ | $TAC_{ct}$ |
-|-------|--------|--------|
-| YFT | 0.6 | 120,000 |
-| BET | 0.8 | 75,000 |
-| SKJ | 0.7 | 220,000 |
+| Stock | $I_{ref}$ | $TAC_{ct}$ | Index ($I$) |
+|-------|--------|--------|--------|
+| YFT | 0.6 | 120,000 | Joint longline |
+| BET | 0.8 | 75,000 | Joint longline |
+| SKJ | 0.7 | 220,000 | Acoustic buoy |
 
 : HCR parameters for pseudo-constant catch MP. {#tbl-par-pcc}
 
@@ -360,20 +356,12 @@ TAC for the next management period $t+1$ is calculated as a function of the curr
 
 $$TAC_{t+1} =
 \begin{cases}
-TAC_{t}, & \text{if }(1-\alpha) \leq I_{G} \leq (1+\alpha) \\
-(1+\beta)TAC_{t}, & \text{if }I_{G} > (1+\alpha) \\
-(1-\beta)TAC_{t}, & \text{if }I_{G} < (1-\alpha)
+TAC_{t}, & \text{if }(1-\alpha)I_{ref} \leq I_{G} \leq (1+\alpha)I_{ref} \\
+(1+\beta)TAC_{t}, & \text{if }I_{G} > (1+\alpha)I_{ref} \\
+(1-\beta)TAC_{t}, & \text{if }I_{G} < (1-\alpha)I_{ref}
 \end{cases}$$
 
-In this case, $I_{G}$ was calculated as:
-
-$$I_G = exp(\frac{1}{n_i}\sum_{i}log(I^*_i))$$
-
-where $n_i$ is the number of selected indices of abundance and $I^*_i$ was calculated for every selected index of abundance $I_i$ using information from the last two years:
-
-$$I^*_i = \frac{(I_{i,y-1}+I_{i,y-2})/2}{I_{ref}}$$
-
-In addition, $TAC_{t} = TAC_{max}$ when $TAC_{t} > TAC_{max}$.
+$I_{G}$ was calculated as specified in @sec-mp-pcc. In addition, $TAC_{t} = TAC_{max}$ when $TAC_{t} > TAC_{max}$.
 
 @fig-ibased shows a representation of this HCR and @tbl-par-ibased shows the HCR parameters used for each stock.
 
@@ -390,6 +378,8 @@ In addition, $TAC_{t} = TAC_{max}$ when $TAC_{t} > TAC_{max}$.
 ### Model-based
 
 Simulated data was included in a stochastic surplus production model in continuous time (SPiCT). SPiCT is a full state-space model, where biomass and fishing dynamics are modelled as states, which are observed indirectly through biomass indices and commercial catches sampled with error [@pedersenStochasticSurplusProduction2017]. SPiCT calculates maximum sustainable yield (MSY) reference points and is able to make short-term projections. SPiCT is the estimation method in the MSE.
+
+Data included in SPiCT were simulated catches and indices of abundance as shown in @tbl-par-pcc. In addition to the acoustic buoy index, SKJ SPiCT models also included a purse seine FAD index derived from catch and effort information.
 
 ![Example of HCR in model-based MPs.](../figures/hcr_example.png){#fig-hcr width="50%"}
 
