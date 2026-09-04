@@ -12,7 +12,7 @@ dir.create(file.path(dat_dir, 'YFT'), showWarnings = FALSE)
 
 # -------------------------------------------------------------------------
 # BET
-grid_folder = file.path(shrpoint_path, "SS3_outputs/Grids3Species/BET/Uncertainty_grid")
+grid_folder = file.path(shrpoint_path, "SS3_outputs/Grids3Species/BET/2025/grid")
 mod_vec = list.files(grid_folder)
 save_par = list()
 save_bio = list()

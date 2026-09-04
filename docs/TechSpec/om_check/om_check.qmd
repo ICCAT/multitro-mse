@@ -36,7 +36,7 @@ require(stringr)
 
 ```{r}
 source('../../../sharepoint_path.R')
-if(params$Stock == 'Bigeye') grid_folder = file.path(shrpoint_path, "SS3_outputs/Grids3Species/BET/Uncertainty_grid")
+if(params$Stock == 'Bigeye') grid_folder = file.path(shrpoint_path, "SS3_outputs/Grids3Species/BET/2025/grid")
 if(params$Stock == 'Skipjack') grid_folder = file.path(shrpoint_path, "SS3_outputs/Grids3Species/SKJ/ESKJ_SS3_project_detailed")
 if(params$Stock == 'Yellowfin') grid_folder = file.path(shrpoint_path, "SS3_outputs/Grids3Species/YFT/update/grid")
 mod = SS_output(dir = file.path(grid_folder, params$Model), 

@@ -86,7 +86,7 @@ In this section, we describe the main aspects of the last stock assessment model
 
 ### Bigeye
 
-The last stock assessment was conducted in 2021 [@iccatReport2021Bigeye2021] using the Stock Synthesis (SS3) platform [@methotStockSynthesisBiological2013]. The data used in the BET assessment and the structure and assumptions of the assessment model are summarized in the sections below.
+The last stock assessment was conducted in 2025 [@iccatReport2025ICCAT2025] using the Stock Synthesis (SS3) platform [@methotStockSynthesisBiological2013]. The data used in the BET assessment and the structure and assumptions of the assessment model are summarized in the sections below.
 
 ```{r}
 #| label: tbl-bet-fleet
@@ -101,7 +101,7 @@ my_tab |> gt() |>
 
 #### Data
 
-The period covered was from 1950 to 2019. The assessment mainly used landings data from longline (LL), purse seine (PS), and baitboat (BB) fleets, with a total of 22 fleets included in the model (@tbl-bet-fleet and @fig-bet-data). There were two indices of abundance: one derived from echosounder information from buoys and one derived from the LL Japan in region 2 (@fig-bet-cpue). The catchability coefficients for the CPUE indices were assumed to be time-invariant.
+The period covered was from 1950 to 2023. The assessment mainly used landings data from longline (LL), purse seine (PS), and baitboat (BB) fleets, with a total of 22 fleets included in the model (@tbl-bet-fleet and @fig-bet-data). There were two indices of abundance: one derived from either echosounder buoys or catch and effort data from purse seiners operating on floating objects, and one derived from the LL Japan in region 2 (@fig-bet-cpue). The catchability coefficients for the CPUE indices were assumed to be time-invariant.
 
 ![Summary of the data used in the BET stock assessment.](../figures/BET/data_plot.png){#fig-bet-data width="80%"}
 
@@ -115,13 +115,13 @@ The model was configured yearly with four seasons per year, one sex, one area, a
 
 #### Biological Parameters
 
-Natural mortality was age-specific and parametrized following @thenEvaluatingPredictivePerformance2015, assuming a maximum age of 17, 20, or 25 years. Maturity-at-age was knife-edge, with 50% at age-3 and 100% thereafter. Fecundity was proportional to body weight. Growth was parametrized following the Richards curve [@richardsFlexibleGrowthFunction1959]. Variability of lengths-at-age was assumed to be a function of mean length-at-age. @fig-bet-biology shows a summary of the biological parametrization.
+Natural mortality was age-specific and parametrized following @lorenzenPopulationDynamicsPotential2005 and @hamelDevelopmentConsiderationsApplication2022, assuming three levels of average natural mortality for adults: 0.26, 0.32, and 0.39. Maturity-at-age was knife-edge, with 50% at age-3 and 100% thereafter. Fecundity was proportional to body weight. Growth was parametrized following the Richards curve [@richardsFlexibleGrowthFunction1959]. Variability of lengths-at-age was assumed to be a function of mean length-at-age. @fig-bet-biology shows a summary of the biological parametrization.
 
-![Growth, maturity, and natural mortality parametrized in the BET assessment model. Natural mortality assumed a maximum age of 20.](../figures/BET/biology.png){#fig-bet-biology}
+![Growth, maturity, and natural mortality parametrized in the BET assessment model. Natural mortality assumed average natural mortality of 0.26 for adults.](../figures/BET/biology.png){#fig-bet-biology}
 
 #### Stock-Recruitment
 
-Expected recruitment to age-0 was calculated from the total spawning stock biomass using the Beverton-Holt stock-recruit function. Recruitment settlement was assumed to occur at month 1, 4, 7, and 10 (i.e., start of every season). The standard error for the log-normally distributed recruitment deviations (sigmaR) was fixed to 0.2, 0.4, or 0.6. Steepness was fixed to values of 0.7, 0.8, or 0.9.
+Expected recruitment to age-0 was calculated from the total spawning stock biomass using the Beverton-Holt stock-recruit function. Recruitment settlement was assumed to occur at month 1, 4, 7, and 10 (i.e., start of every season). The standard error for the log-normally distributed recruitment deviations (sigmaR) was fixed to 0.4. Steepness was fixed to values of 0.7, 0.8, or 0.9.
 
 #### Selectivity
 
@@ -264,7 +264,7 @@ Individual diagnostic reports with objective function values and plots of model 
 #| tbl-cap: OM diagnostics reports per stock. See @tbl-unc-grid for more information on the axes of uncertainty.
 my_tab = read.csv('../tables/selected_OM.csv')
 # Sort data fframe to show species as columns:
-n_max_runs = 27 # maximum number runs per stock
+n_max_runs = 18 # maximum number runs per stock
 diag_df = data.frame(Bigeye = rep(NA, times = n_max_runs),
                      Skipjack = rep(NA, times = n_max_runs),
                      Yellowfin = rep(NA, times = n_max_runs))
@@ -306,7 +306,7 @@ my_tab |> gt() |>
   cols_align(align = 'center', columns = c('Bigeye', 'Skipjack', 'Yellowfin'))
 ```
 
-The historical period in the MSE corresponds to the years covered in the assessment model (@fig-time). On the other side, the simulation period corresponds to the years when the harvest control rules (HCR) are evaluated. The simulation period started in 2023 and ended in 2050. Since the YFT and SKJ assessments ended prior to 2023, some initial runs were needed for those stocks assuming average catches from the last three years (@fig-time). 
+The historical period in the MSE corresponds to the years covered in the assessment model (@fig-time). On the other side, the simulation period corresponds to the years when the harvest control rules (HCR) are evaluated. The simulation period started in 2026 and ended in 2057. Since some assessments ended prior to this year, some initial runs were needed for those stocks assuming observed and average catches from the last years ("Initial runs", @fig-time). 
 
 ![Periods in the MSE.](../figures/mse_runs.png){#fig-time}
 
@@ -324,23 +324,21 @@ The management advice is given every three years (*management period*) and the t
 
 ### Pseudo-constant catch {#sec-mp-pcc}
 
-The total allowable catch (TAC) for the next management period ($t+1$) is assumed constant, unless a reference value ($I_{G}$) derived from a group of indices of abundance in the last two years falls below a reference value $I_{ref}$:
+The total allowable catch (TAC) for the next management period ($\{y+1,y+2,y+3\}$) is assumed constant, unless $\bar{J}$, derived from the index of abundance in the preceding three years, falls below a reference value $J_{ref}$ (see @fig-pcc):
 
-$$TAC_{t+1} =
+$$TAC_{\{y+1,y+2,y+3\}} =
 \begin{cases}
-TAC_{ct}, & \text{if }I_{G} \geq I_{ref} \\
-TAC_{ct}(\frac{I_{G}}{I_{ref}}), & \text{if }I_{G} < I_{ref}
+TAC_{ct}, & \text{if }\bar{J} \geq J_{ref} \\
+TAC_{ct}(\frac{\bar{J}}{J_{ref}}), & \text{if }\bar{J} < J_{ref}
 \end{cases}$$
 
-$I_{G}$ was calculated using index of abundance information ($I$) from the previous two years ($y-1$ and $y-2$):
+@tbl-par-pcc shows the $J_{ref}$ values used for each stock. $\bar{J}$ was derived from from index of abundance values from the preceding three years:
 
-$$I_G = \frac{I_{y-1}+I_{y-2}}{2}$$
+$$\bar{J} = \frac{J_{y-1}+J_{y-2}+J_{y-3}}{3}$$
 
-In addition, the TAC variation between consecutive management periods $TAC_{t+1}$ and $TAC_{t}$ could not exceed 5% when $I_G < I_{ref}$.
+Where $J$ represents the index of abundance (see @tbl-par-pcc). In addition, the TAC variation between consecutive management periods $TAC_{\{y+1,y+2,y+3\}}$ and $TAC_{\{y-2,y-1,y\}}$ could not exceed 15%.
 
-@fig-pcc shows a representation of this HCR and @tbl-par-pcc shows the HCR parameters used for each stock.
-
-| Stock | $I_{ref}$ | $TAC_{ct}$ | Index ($I$) |
+| Stock | $J_{ref}$ | $TAC_{ct}$ | Index ($J$) |
 |-------|--------|--------|--------|
 | YFT | 0.6 | 120,000 | Joint longline |
 | BET | 0.8 | 75,000 | Joint longline |
@@ -348,32 +346,29 @@ In addition, the TAC variation between consecutive management periods $TAC_{t+1}
 
 : HCR parameters for pseudo-constant catch MP. {#tbl-par-pcc}
 
-![Derivation of the TAC for the next management period ($TAC_{t+1}$) in the pseudoconstant catch MP.](../figures/pccatch.png){#fig-pcc width="55%"}
+![Derivation of the TAC for the next management period ($TAC_{\{y+1,y+2,y+3\}}$) in the pseudoconstant catch MP.](../figures/pccatch.png){#fig-pcc width="55%"}
 
 ### Index-based
 
-TAC for the next management period $t+1$ is calculated as a function of the current TAC ($TAC_{t}$):
+The total allowable catch (TAC) for the next management period ($\{y+1,y+2,y+3\}$) is calculated from the TAC in the current management period $\{y-2,y-1,y\}$ and a factor $J_{rat}$ derived from the index of abundance (see @tbl-par-pcc). We derive the ratio of change in the index of abundance $J$ between the last three years ($y-1$, $y-2$, and $y-3$) and the preceding three years ($y-4$, $y-5$, and $y-6$):
 
-$$TAC_{t+1} =
-\begin{cases}
-TAC_{t}, & \text{if }(1-\alpha)I_{ref} \leq I_{G} \leq (1+\alpha)I_{ref} \\
-(1+\beta)TAC_{t}, & \text{if }I_{G} > (1+\alpha)I_{ref} \\
-(1-\beta)TAC_{t}, & \text{if }I_{G} < (1-\alpha)I_{ref}
-\end{cases}$$
+$$J_{rat} = \frac{J_{y-1}+J_{y-2}+J_{y-3}}{J_{y-4}+J_{y-5}+J_{y-6}}$$
 
-$I_{G}$ was calculated as specified in @sec-mp-pcc. In addition, $TAC_{t} = TAC_{max}$ when $TAC_{t} > TAC_{max}$.
+Then, the TAC for the next management period is obtained:
 
-@fig-ibased shows a representation of this HCR and @tbl-par-ibased shows the HCR parameters used for each stock.
+$$TAC_{\{y+1,y+2,y+3\}} = J_{rat} TAC_{\{y-2,y-1,y\}} $$
 
-| Stock | $I_{ref}$ | $TAC_{max}$ | $\alpha$ | $\beta$ | 
-|-------|--------|--------|--------|--------|
-| YFT | 0.75 | 140,000 | 0.05 | 0.15 |
-| BET | 0.8 | 80,000 | 0.05 | 0.1 |
-| SKJ | 0.85 | 240,000 | 0.05 | 0.05 |
+We imposed a TAC variability restriction between consecutive management periods $TAC_{\{y+1,y+2,y+3\}}$ and $TAC_{\{y-2,y-1,y\}}$ of 15% maximum.
 
-: HCR parameters for index-based MP. {#tbl-par-ibased}
+In addition, $TAC_{\{y+1,y+2,y+3\}}$ was restricted to be equal or lower than a maximum TAC (see @tbl-par-ibased).
 
-![Derivation of the TAC for the next management period ($TAC_{t+1}$) in the index-based MP.](../figures/index_based.png){#fig-ibased width="55%"}
+| Stock | $TAC_{max}$ |
+|-------|--------|
+| YFT | 140,000 |
+| BET | 80,000 |
+| SKJ | 240,000 |
+
+: Maximum TAC imposed in the index-based MP. {#tbl-par-ibased}
 
 ### Model-based
 
@@ -389,7 +384,7 @@ TAC is derived from a harvest control rule based on stock status estimate (@fig-
 - $F_{tgt}=0.9F_{msy}$ and $B_{thr}=B_{msy}$
 - $F_{tgt}=F_{msy}$ and $B_{thr}=B_{msy}$
 
-In addition, $B_{lim}=0.4\times B_{msy}$ and $F_{mim}=0.1\times F_{msy}$ for all cases. A maximum TAC restriction ($TAC_{max}$) could also be applied in some scenarios (@tbl-par-mbased). TAC variation between consecutive management periods $TAC_{t+1}$ and $TAC_{t}$ could not exceed 15%.
+In addition, $B_{lim}=0.4\times B_{msy}$ and $F_{mim}=0.1\times F_{msy}$ for all cases. A maximum TAC restriction ($TAC_{max}$) could also be applied in some scenarios (@tbl-par-mbased). TAC variation between consecutive management periods $TAC_{\{y+1,y+2,y+3\}}$ and $TAC_{\{y-2,y-1,y\}}$ could not exceed 15%.
 
 ![HCR evaluated in the MSE. These HCR come from combinations of $F_{tgt}$ (rows) and $B_{thr}$ (columns).](../figures/hcr_combs_2.png){#fig-hcr-combs width="60%"}
 

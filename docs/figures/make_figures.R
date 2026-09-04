@@ -15,7 +15,7 @@ dir.create(file.path(fig_dir, 'SKJ'), showWarnings = FALSE)
 dir.create(file.path(fig_dir, 'YFT'), showWarnings = FALSE)
 
 # Read SS3 model
-betmod = SS_output(file.path(shrpoint_path, "SS3_outputs/Grids3Species/BET/Uncertainty_grid/M20_h0.8_sigmaR0.4"), covar = FALSE)
+betmod = SS_output(file.path(shrpoint_path, "SS3_outputs/Grids3Species/BET/2025/grid/M0.26_h0.7_BAI"), covar = FALSE)
 skjmod = SS_output(file.path(shrpoint_path, "SS3_outputs/Grids3Species/SKJ/ESKJ_SS3_project_detailed/noBuoy_50thGrowth_h0.8"), covar = FALSE)
 yftmod = SS_output(file.path(shrpoint_path, "SS3_outputs/Grids3Species/YFT/update/grid/22_ref_case_midM_h08"), covar = FALSE)
 

@@ -2,13 +2,13 @@ rm(list = ls())
 require(dplyr)
 require(r4ss)
 source('sharepoint_path.R')
-tbl_dir = 'docs/TechSpec/tables'
+tbl_dir = 'docs/tables'
 dir.create(file.path(tbl_dir, 'BET'), showWarnings = FALSE)
 dir.create(file.path(tbl_dir, 'SKJ'), showWarnings = FALSE)
 dir.create(file.path(tbl_dir, 'YFT'), showWarnings = FALSE)
 
 # Read SS3 model
-betmod = SS_output(file.path(shrpoint_path, "SS3_outputs/Grids3Species/BET/Uncertainty_grid/M20_h0.8_sigmaR0.4"), covar = FALSE)
+betmod = SS_output(file.path(shrpoint_path, "SS3_outputs/Grids3Species/BET/2025/grid/M0.26_h0.7_BAI"), covar = FALSE)
 skjmod = SS_output(file.path(shrpoint_path, "SS3_outputs/Grids3Species/SKJ/ESKJ_SS3_project_detailed/noBuoy_50thGrowth_h0.8"), covar = FALSE)
 yftmod = SS_output(file.path(shrpoint_path, "SS3_outputs/Grids3Species/YFT/update/grid/22_ref_case_midM_h08"), covar = FALSE)
 
@@ -16,9 +16,9 @@ yftmod = SS_output(file.path(shrpoint_path, "SS3_outputs/Grids3Species/YFT/updat
 # Fleet table
 
 # BET
-mytab = data.frame(Fleet = betmod$FleetNames)
+mytab = data.frame(Fleet = betmod$FleetNames[betmod$fleet_type == 1])
 mytab$CPUE = 'No'
-mytab$CPUE[sort(unique(betmod$cpue$Fleet))] = 'Yes'
+mytab$CPUE[sort(unique(betmod$cpue$Fleet))[1:2]] = 'Yes'
 mytab = mytab %>% mutate(Description = c("Purse seine (all fleets except Ghana, USA, and Venezuela)",
                                          "Purse seine (all fleets except Ghana, USA, and Venezuela)",
                                          "Purse seine free school (all fleets except Ghana, USA, and Venezuela)",
@@ -31,15 +31,15 @@ mytab = mytab %>% mutate(Description = c("Purse seine (all fleets except Ghana, 
                                          "Longline North Japan",
                                          "Longline Tropical Japan",
                                          "Longline South Japan",
-                                         "Longline North Other (all fleets except Japan and Chinese Taipei)",
-                                         "Longline Tropical Other (all fleets except Japan and Chinese Taipei)",
-                                         "Longline South Other (all fleets except Japan and Chinese Taipei)",
                                          "Longline North Chinese Taipei",
                                          "Longline Tropical Chinese Taipei",
                                          "Longline South Chinese Taipei",
                                          "RR West Atlantic USA, Canada, UK-Sta Helena",
-                                         "Handline Brazil",
                                          "Purse seine West Atlantic (USA, Venezuela)",
+                                         "Longline North Other (all fleets except Japan and Chinese Taipei)",
+                                         "Longline Tropical Other (all fleets except Japan and Chinese Taipei)",
+                                         "Longline South Other (all fleets except Japan and Chinese Taipei)",
+                                         "Handline Brazil",
                                          "Other"
                                          ),
                          Region = c("R2/R1", "R2/R1", "R2/R1", "R2/R3", "R2", "R2s", "R2n", "R2n",

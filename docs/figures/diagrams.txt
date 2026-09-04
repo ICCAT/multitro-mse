@@ -48,6 +48,7 @@ flowchart TB
   init: {
     'theme': 'default',
     'themeVariables': {
+      'fontSize': '20px',
       'sectionBkgColor': '#dca06d',
       'altSectionBkgColor': '#a55b4b',
       'sectionBkgColor2': '#b184b3',
@@ -64,17 +65,19 @@ flowchart TB
 
 gantt
     dateFormat  YYYY-MM-DD
+    axisFormat  %Y
     section Bigeye
-    End of historical period :done, a1, 2017-01-01, 3y
-    Initial runs     :active, a2, after a1  , 3y
-    Start of simulation period:after a2, 6y
+    End of historical period :done, a1, 2017-01-01, 7y
+    Initial runs     :active, a2, after a1  , 2y
+    Start of simulation period:after a2, 5y
     section Skipjack
     End of historical period :done, b1, 2017-01-01, 4y
-    Initial runs     :active, b2, after b1  , 2y
-    Start of simulation period:after b2, 6y
+    Initial runs     :active, b2, after b1  , 5y
+    Start of simulation period:after b2, 5y
     section Yellowfin
     End of historical period :done, c1, 2017-01-01, 6y
-    Start of simulation period:after c1, 6y
+    Initial runs     :active, c2, after c1  , 3y
+    Start of simulation period:after c2, 5y
     todayMarker off
 
 
@@ -90,11 +93,11 @@ gantt
 timeline
     section Previous Management Periods
         ... : Data available for MP
-    section Current <br> Management Period (t)
+    section Current <br> Management Period
         y-2 : Data available for MP
         y-1 : Data available for MP
         y (present) : Run MP
-    section Next <br> Management Period (t+1)
+    section Next <br> Management Period
         y+1 : Apply TAC from MP
         y+2 : Apply TAC from MP
         y+3 : Apply TAC from MP

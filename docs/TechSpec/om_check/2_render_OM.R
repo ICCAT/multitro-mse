@@ -1,7 +1,7 @@
 rm(list = ls())
 require(quarto)
 require(here)
-selected_om = read.csv("docs/TechSpec/tables/selected_OM.csv")
+selected_om = read.csv("docs/tables/selected_OM.csv")
 this_path = file.path(here::here(), 'docs/TechSpec/om_check')
 
 # Render OM check html:

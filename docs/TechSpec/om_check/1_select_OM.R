@@ -3,7 +3,7 @@ require(dplyr)
 source('sharepoint_path.R')
 
 # BET models:
-grid_folder = file.path(shrpoint_path, "SS3_outputs/Grids3Species/BET/Uncertainty_grid")
+grid_folder = file.path(shrpoint_path, "SS3_outputs/Grids3Species/BET/2025/grid")
 mod_vec = list.files(grid_folder)
 bet_df = data.frame(Stock = 'Bigeye', Model = mod_vec)
 
@@ -14,9 +14,9 @@ skj_df = data.frame(Stock = 'Skipjack', Model = mod_vec)
 
 # yft models:
 grid_folder = file.path(shrpoint_path, "SS3_outputs/Grids3Species/YFT/update/grid")
-mod_vec = list.files(grid_folder)[-1]
+mod_vec = list.files(grid_folder)
 yft_df = data.frame(Stock = 'Yellowfin', Model = mod_vec)
 
 # Combine all models:
 save_mod = bind_rows(list(bet_df, skj_df, yft_df))
-write.csv(save_mod, 'docs/TechSpec/tables/selected_OM.csv', row.names = FALSE)
+write.csv(save_mod, 'docs/tables/selected_OM.csv', row.names = FALSE)
